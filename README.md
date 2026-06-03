@@ -43,22 +43,7 @@ Copia el archivo de ejemplo:
 cp .env.example .env.local
 ```
 
-Abre `.env.local` y rellena con tus datos de Firebase y los detalles de la fiesta:
 
-```env
-NEXT_PUBLIC_FIREBASE_API_KEY=AIza...
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=cumple-valentina.firebaseapp.com
-...
-
-NEXT_PUBLIC_BIRTHDAY_NAME=Valentina
-NEXT_PUBLIC_BIRTHDAY_AGE=25
-NEXT_PUBLIC_PARTY_DATE=2025-07-19T20:00:00
-NEXT_PUBLIC_PARTY_PLACE=Terraza La Condesa
-NEXT_PUBLIC_PARTY_ADDRESS=Av. Ámsterdam 150, Condesa, CDMX
-NEXT_PUBLIC_PARTY_TIME=8:00 PM — hasta que el cuerpo aguante
-NEXT_PUBLIC_RSVP_DEADLINE=15 de julio
-NEXT_PUBLIC_ADMIN_PASSWORD=tu_contraseña_secreta
-```
 
 ### 4 — Reglas de Firestore
 
