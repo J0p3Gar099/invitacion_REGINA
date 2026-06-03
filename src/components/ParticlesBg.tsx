@@ -19,6 +19,7 @@ export default function ParticlesBg() {
           width:${size}px; height:${size}px;
           --dur:${2 + Math.random() * 4}s;
           --delay:-${Math.random() * 5}s;
+          --parallax-speed:${0.02 + Math.random() * 0.08};
         `
         stars.appendChild(s)
       }
@@ -47,6 +48,19 @@ export default function ParticlesBg() {
         conf.appendChild(c)
       }
     }
+
+    // Parallax on scroll
+    const handleScroll = () => {
+      const scrollY = window.scrollY
+      const starEls = starsRef.current?.querySelectorAll<HTMLElement>('.star')
+      starEls?.forEach(star => {
+        const speed = parseFloat(star.style.getPropertyValue('--parallax-speed') || '0.05')
+        star.style.transform = `translateY(${scrollY * speed}px)`
+      })
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   return (

@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { PARTY } from '@/lib/config'
 
 interface TimeLeft {
@@ -24,6 +24,42 @@ function getTimeLeft(): TimeLeft {
   }
 }
 
+function FlipDigit({ value, label }: { value: number; label: string }) {
+  const display = String(value).padStart(2, '0')
+  const prevRef = useRef(display)
+  const [flipping, setFlipping] = useState(false)
+  const [showNext, setShowNext] = useState(display)
+
+  useEffect(() => {
+    if (prevRef.current !== display) {
+      setFlipping(true)
+      const t = setTimeout(() => {
+        setShowNext(display)
+        setFlipping(false)
+        prevRef.current = display
+      }, 250)
+      return () => clearTimeout(t)
+    }
+  }, [display])
+
+  return (
+    <div className="cd-block">
+      <span
+        className="cd-num"
+        style={{
+          display: 'block',
+          transition: flipping ? 'transform 0.25s ease-in, opacity 0.25s ease-in' : 'none',
+          transform: flipping ? 'translateY(-8px) scaleY(0.6)' : 'translateY(0) scaleY(1)',
+          opacity: flipping ? 0 : 1,
+        }}
+      >
+        {showNext}
+      </span>
+      <span className="cd-label">{label}</span>
+    </div>
+  )
+}
+
 export default function Countdown() {
   const [time, setTime] = useState<TimeLeft | null>(null)
 
@@ -33,12 +69,10 @@ export default function Countdown() {
     return () => clearInterval(id)
   }, [])
 
-  const labels = ['días', 'horas', 'minutos', 'segundos']
-
   if (!time) {
     return (
       <div className="countdown">
-        {labels.map(l => (
+        {['días', 'horas', 'minutos', 'segundos'].map(l => (
           <div key={l} className="cd-block">
             <span className="cd-num">--</span>
             <span className="cd-label">{l}</span>
@@ -66,10 +100,7 @@ export default function Countdown() {
   return (
     <div className="countdown" role="timer" aria-label="Tiempo para la fiesta">
       {blocks.map(b => (
-        <div key={b.label} className="cd-block">
-          <span className="cd-num">{String(b.num).padStart(2, '0')}</span>
-          <span className="cd-label">{b.label}</span>
-        </div>
+        <FlipDigit key={b.label} value={b.num} label={b.label} />
       ))}
     </div>
   )

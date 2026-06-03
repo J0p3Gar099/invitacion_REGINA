@@ -1,19 +1,31 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { subscribeRSVPs, subscribeAllMessages, approveMessage, rejectMessage, type RSVPEntry, type WallMessage } from '@/lib/firestore'
+import { loginAdmin, logoutAdmin, onAuthChange } from '@/lib/auth'
 import Link from 'next/link'
-
-const ADMIN_PASS = process.env.NEXT_PUBLIC_ADMIN_PASSWORD ?? 'fiesta2025'
 
 export default function AdminPage() {
   const [authed, setAuthed] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [email, setEmail] = useState('')
   const [pwd, setPwd] = useState('')
   const [error, setError] = useState('')
+  const [signingIn, setSigningIn] = useState(false)
 
   const [rsvps, setRsvps] = useState<RSVPEntry[]>([])
   const [messages, setMessages] = useState<WallMessage[]>([])
   const [tab, setTab] = useState<'rsvps' | 'messages'>('rsvps')
 
+  // Escuchar estado de auth
+  useEffect(() => {
+    const unsub = onAuthChange(user => {
+      setAuthed(!!user)
+      setLoading(false)
+    })
+    return unsub
+  }, [])
+
+  // Suscribir a datos solo si está autenticado
   useEffect(() => {
     if (!authed) return
     const u1 = subscribeRSVPs(setRsvps)
@@ -21,9 +33,22 @@ export default function AdminPage() {
     return () => { u1(); u2() }
   }, [authed])
 
-  const tryLogin = () => {
-    if (pwd === ADMIN_PASS) { setAuthed(true); setError('') }
-    else setError('Contraseña incorrecta')
+  const tryLogin = async () => {
+    if (!email.trim() || !pwd.trim()) return
+    setSigningIn(true)
+    setError('')
+    try {
+      await loginAdmin(email.trim(), pwd)
+    } catch (e: unknown) {
+      const msg = (e as { code?: string })?.code
+      if (msg === 'auth/invalid-credential' || msg === 'auth/wrong-password' || msg === 'auth/user-not-found') {
+        setError('Email o contraseña incorrectos')
+      } else {
+        setError('Error al iniciar sesión')
+      }
+    } finally {
+      setSigningIn(false)
+    }
   }
 
   const attending = rsvps.filter(r => r.attending)
@@ -32,67 +57,77 @@ export default function AdminPage() {
   const pending = messages.filter(m => !m.approved)
   const approved = messages.filter(m => m.approved)
 
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    background: 'rgba(255,255,255,0.04)',
+    border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: 10,
+    padding: '12px 16px',
+    color: '#f0e8ff',
+    fontSize: 14,
+    outline: 'none',
+    marginBottom: 10,
+    fontFamily: 'inherit',
+  }
+
+  if (loading) {
+    return (
+      <div style={{ minHeight: '100vh', background: '#0a0512', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <p style={{ color: 'rgba(240,232,255,0.3)', fontFamily: 'system-ui' }}>Cargando…</p>
+      </div>
+    )
+  }
+
   if (!authed) {
     return (
       <div style={{
-        minHeight: '100vh',
-        background: '#0a0512',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '2rem',
-        fontFamily: 'var(--font-dm), system-ui, sans-serif',
+        minHeight: '100vh', background: '#0a0512',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: '2rem', fontFamily: 'var(--font-dm), system-ui, sans-serif',
       }}>
         <div style={{
           background: 'rgba(180,138,255,0.07)',
           border: '1px solid rgba(180,138,255,0.25)',
-          borderRadius: 20,
-          padding: '2.5rem',
-          width: '100%',
-          maxWidth: 380,
-          textAlign: 'center',
-          color: '#f0e8ff',
+          borderRadius: 20, padding: '2.5rem',
+          width: '100%', maxWidth: 380,
+          textAlign: 'center', color: '#f0e8ff',
         }}>
           <p style={{ fontSize: 28, marginBottom: 8 }}>⚙️</p>
           <h1 style={{ fontSize: '1.4rem', fontFamily: 'Georgia, serif', fontWeight: 400, marginBottom: 24 }}>
             Panel de administración
           </h1>
           <input
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && tryLogin()}
+            placeholder="Correo electrónico"
+            style={inputStyle}
+          />
+          <input
             type="password"
             value={pwd}
             onChange={e => setPwd(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && tryLogin()}
             placeholder="Contraseña"
-            style={{
-              width: '100%',
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: 10,
-              padding: '12px 16px',
-              color: '#f0e8ff',
-              fontSize: 14,
-              outline: 'none',
-              marginBottom: 10,
-              fontFamily: 'inherit',
-            }}
+            style={inputStyle}
           />
           {error && <p style={{ color: '#ff85c2', fontSize: 13, marginBottom: 10 }}>{error}</p>}
           <button
             onClick={tryLogin}
+            disabled={signingIn || !email.trim() || !pwd.trim()}
             style={{
               width: '100%',
               background: 'linear-gradient(135deg, #b48aff, #ff85c2)',
-              border: 'none',
-              borderRadius: 10,
-              padding: '13px',
-              color: 'white',
-              fontSize: 14,
-              fontWeight: 500,
-              cursor: 'pointer',
+              border: 'none', borderRadius: 10,
+              padding: '13px', color: 'white',
+              fontSize: 14, fontWeight: 500,
+              cursor: signingIn ? 'not-allowed' : 'pointer',
+              opacity: signingIn ? 0.6 : 1,
               fontFamily: 'inherit',
             }}
           >
-            Entrar
+            {signingIn ? 'Entrando…' : 'Entrar'}
           </button>
           <Link href="/" style={{ display: 'block', marginTop: 16, fontSize: 12, color: 'rgba(240,232,255,0.3)', textDecoration: 'none' }}>
             ← Volver a la invitación
@@ -103,18 +138,15 @@ export default function AdminPage() {
   }
 
   const S: React.CSSProperties = {
-    minHeight: '100vh',
-    background: '#0a0512',
-    color: '#f0e8ff',
-    fontFamily: 'var(--font-dm), system-ui, sans-serif',
+    minHeight: '100vh', background: '#0a0512',
+    color: '#f0e8ff', fontFamily: 'var(--font-dm), system-ui, sans-serif',
     padding: '2rem 1.5rem',
   }
 
   const card: React.CSSProperties = {
     background: 'rgba(255,255,255,0.03)',
     border: '1px solid rgba(255,255,255,0.08)',
-    borderRadius: 14,
-    padding: '1.25rem 1.5rem',
+    borderRadius: 14, padding: '1.25rem 1.5rem',
     marginBottom: 10,
   }
 
@@ -122,14 +154,21 @@ export default function AdminPage() {
     <div style={S}>
       <div style={{ maxWidth: 860, margin: '0 auto' }}>
 
-        {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem', flexWrap: 'wrap', gap: 12 }}>
           <h1 style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: '1.8rem', fontWeight: 400 }}>
             Panel de admin
           </h1>
-          <Link href="/" style={{ fontSize: 12, color: 'rgba(240,232,255,0.4)', textDecoration: 'none' }}>
-            ← Ver invitación
-          </Link>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            <button
+              onClick={logoutAdmin}
+              style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 100, padding: '6px 16px', fontSize: 12, color: 'rgba(240,232,255,0.4)', cursor: 'pointer', fontFamily: 'inherit' }}
+            >
+              Cerrar sesión
+            </button>
+            <Link href="/" style={{ fontSize: 12, color: 'rgba(240,232,255,0.4)', textDecoration: 'none' }}>
+              ← Ver invitación
+            </Link>
+          </div>
         </div>
 
         {/* Stats */}
@@ -156,13 +195,9 @@ export default function AdminPage() {
               style={{
                 background: tab === t ? 'rgba(180,138,255,0.15)' : 'transparent',
                 border: `1px solid ${tab === t ? 'rgba(180,138,255,0.4)' : 'rgba(255,255,255,0.08)'}`,
-                borderRadius: 100,
-                padding: '8px 20px',
-                fontSize: 13,
+                borderRadius: 100, padding: '8px 20px', fontSize: 13,
                 color: tab === t ? '#d4b8ff' : 'rgba(240,232,255,0.45)',
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-                transition: 'all 0.2s',
+                cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s',
               }}
             >
               {t === 'rsvps' ? `RSVPs (${rsvps.length})` : `Mensajes (${messages.length})`}
@@ -176,6 +211,9 @@ export default function AdminPage() {
             <p style={{ fontSize: 11, letterSpacing: 4, textTransform: 'uppercase', color: '#b48aff', marginBottom: '1.25rem' }}>
               Confirmados ({attending.length})
             </p>
+            {attending.length === 0 && (
+              <p style={{ textAlign: 'center', color: 'rgba(240,232,255,0.3)', padding: '2rem 0' }}>Aún no hay confirmaciones</p>
+            )}
             {attending.map(r => (
               <div key={r.id} style={card}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>

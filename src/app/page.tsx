@@ -5,6 +5,8 @@ import DrinksList from '@/components/DrinksList'
 import MessageWall from '@/components/MessageWall'
 import RSVPForm from '@/components/RSVPForm'
 import { PARTY } from '@/lib/config'
+import DrinkRoulette from '@/components/DrinkRoulette'
+
 import Link from 'next/link'
 
 export default function Home() {
@@ -76,6 +78,11 @@ export default function Home() {
           <p className="section-label" id="drinks-title">¿Qué llevas de tomar?</p>
           <DrinksList />
         </section>
+        <hr className="divider" />
+
+<section className="section" aria-labelledby="roulette-title">
+  <DrinkRoulette />
+</section>
 
         {/* ── Message Wall ──────────────────────────────── */}
         <section className="wall-section" aria-labelledby="wall-title">
