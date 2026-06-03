@@ -26,51 +26,6 @@ cd birthday-invite
 npm install
 ```
 
-### 2 — Crear proyecto en Firebase
-
-1. Ve a [https://console.firebase.google.com](https://console.firebase.google.com)
-2. Clic en **"Add project"** → ponle un nombre (ej. `cumple-valentina`)
-3. Desactiva Google Analytics si no lo necesitas → **Create project**
-4. En el menú lateral: **Firestore Database** → **Create database** → modo **Production** → elige región `nam5 (us-central)`
-5. En el menú lateral: **Project Settings** (ícono ⚙) → pestaña **"Your apps"** → clic en `</>` (Web)
-6. Registra la app, copia los valores de `firebaseConfig`
-
-### 3 — Variables de entorno
-
-Copia el archivo de ejemplo:
-
-```bash
-cp .env.example .env.local
-```
-
-Abre `.env.local` y rellena con tus datos de Firebase y los detalles de la fiesta:
-
-```env
-NEXT_PUBLIC_FIREBASE_API_KEY=AIza...
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=cumple-valentina.firebaseapp.com
-...
-
-NEXT_PUBLIC_BIRTHDAY_NAME=Valentina
-NEXT_PUBLIC_BIRTHDAY_AGE=25
-NEXT_PUBLIC_PARTY_DATE=2025-07-19T20:00:00
-NEXT_PUBLIC_PARTY_PLACE=Terraza La Condesa
-NEXT_PUBLIC_PARTY_ADDRESS=Av. Ámsterdam 150, Condesa, CDMX
-NEXT_PUBLIC_PARTY_TIME=8:00 PM — hasta que el cuerpo aguante
-NEXT_PUBLIC_RSVP_DEADLINE=15 de julio
-NEXT_PUBLIC_ADMIN_PASSWORD=tu_contraseña_secreta
-```
-
-### 4 — Reglas de Firestore
-
-En la consola de Firebase → **Firestore** → pestaña **Rules**, pega el contenido de `firestore.rules` y publica.
-
-### 5 — Correr en desarrollo
-
-```bash
-npm run dev
-```
-
-Abre [http://localhost:3000](http://localhost:3000)
 
 ---
 
