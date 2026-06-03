@@ -486,8 +486,44 @@ footer {
 
 /* ── Responsive ────────────────────────────────────────────── */
 @media (max-width: 600px) {
-  .countdown { gap: 0.75rem; }
-  .cd-block { min-width: 72px; padding: 1.2rem 1.2rem; }
-  .cd-num { font-size: 2.2rem; }
-  .location-card { flex-direction: column; }
+
+  /* Hero */
+  .hero { padding: 4rem 1.25rem 5rem; }
+  .hero-name { letter-spacing: -1px; }
+  .glow-orb { width: 280px; height: 280px; }
+  .hero-date { font-size: 11px; letter-spacing: 2px; }
+
+  /* Countdown */
+  .countdown { gap: 0.6rem; }
+  .cd-block { min-width: 68px; padding: 1rem 0.9rem; }
+  .cd-num { font-size: 2rem; }
+  .cd-label { font-size: 9px; letter-spacing: 2px; }
+
+  /* Sections */
+  .section { padding: 3.5rem 1.25rem; }
+  .wall-section { padding: 3.5rem 1.25rem; }
+  .rsvp-section { padding: 4rem 1.25rem; }
+
+  /* Location */
+  .location-card { flex-direction: column; gap: 1.25rem; }
+  .location-pin { width: 52px; height: 52px; font-size: 22px; }
+  .location-info h3 { font-size: 1.25rem; }
+
+  /* Grids — 1 columna en móvil */
+  .gifts-grid { grid-template-columns: 1fr; }
+  .drinks-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* RSVP */
+  .rsvp-form { max-width: 100%; }
+  .rsvp-btns { flex-direction: column; }
+  .btn-ghost { flex: unset; }
+
+  /* Form row — inputs apilados */
+  .form-row { flex-direction: column; gap: 10px; }
+
+  /* Admin link */
+  .admin-link { bottom: 1rem; right: 1rem; font-size: 11px; padding: 7px 14px; }
+
+  /* Marquee — texto más chico */
+  .msg-quote { font-size: 0.9rem; }
 }
