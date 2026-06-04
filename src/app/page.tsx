@@ -1,5 +1,7 @@
 import ParticlesBg from '@/components/ParticlesBg'
 import HeroParallax from '@/components/HeroParallax'
+import ConfettiBlast from '@/components/ConfettiBlast'
+import DiscoSpotlights from '@/components/DiscoSpotlights'
 import Countdown from '@/components/Countdown'
 import DrinksList from '@/components/DrinksList'
 import MessageWall from '@/components/MessageWall'
@@ -107,6 +109,8 @@ export default function Home() {
     <>
       <ParticlesBg />
       <HeroParallax />
+      <ConfettiBlast />
+      <DiscoSpotlights />
 
       <main className="page">
 

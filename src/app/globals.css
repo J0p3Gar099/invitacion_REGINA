@@ -720,13 +720,31 @@ footer {
   width: clamp(120px, 18vw, 220px);
   height: auto;
   aspect-ratio: 220 / 190;
-  opacity: 0.9;
-  animation: numFloat 7s ease-in-out infinite -1.5s;
+  opacity: 0.92;
+  /* Layered animations: float up/down + gentle sway + metallic shimmer glow */
+  animation:
+    numFloat   6s  ease-in-out infinite -1.5s,
+    numSway    9s  ease-in-out infinite -3s,
+    numGlow    4s  ease-in-out infinite -0.5s;
+  filter: drop-shadow(0 8px 24px rgba(9,29,74,0.18));
 }
 
 @keyframes numFloat {
-  0%, 100% { transform: translateY(calc(var(--px, 0px) + 0px)); }
-  50%       { transform: translateY(calc(var(--px, 0px) - 14px)); }
+  0%, 100% { transform: translateY(calc(var(--px, 0px) + 0px))    rotate(var(--sway, 0deg)); }
+  25%       { transform: translateY(calc(var(--px, 0px) - 10px))   rotate(var(--sway, 0deg)); }
+  50%       { transform: translateY(calc(var(--px, 0px) - 18px))   rotate(var(--sway, 0deg)); }
+  75%       { transform: translateY(calc(var(--px, 0px) - 8px))    rotate(var(--sway, 0deg)); }
+}
+
+@keyframes numSway {
+  0%, 100% { --sway: 0deg; }
+  25%       { --sway: -2.5deg; }
+  75%       { --sway: 2.5deg; }
+}
+
+@keyframes numGlow {
+  0%, 100% { filter: drop-shadow(0 8px 24px rgba(9,29,74,0.18)) drop-shadow(0 0 0px rgba(200,215,240,0)); }
+  50%       { filter: drop-shadow(0 8px 24px rgba(9,29,74,0.22)) drop-shadow(0 0 18px rgba(200,215,240,0.45)); }
 }
 
 /* ══════════════════════════════════════════════════════════════
