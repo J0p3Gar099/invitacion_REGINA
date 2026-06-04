@@ -663,6 +663,7 @@ footer {
   position: absolute;
   pointer-events: none;
   z-index: 0;
+  will-change: transform;
 }
 
 /* ── Disco ball top-left ─────────────────────────────────────── */
@@ -672,7 +673,7 @@ footer {
   width: 240px;
   height: 240px;
   opacity: 0.85;
-  animation: ballFloat 8s ease-in-out infinite;
+  animation: ballFloatY 8s ease-in-out infinite;
 }
 
 /* ── Disco ball bottom-right ─────────────────────────────────── */
@@ -682,12 +683,12 @@ footer {
   width: 160px;
   height: 160px;
   opacity: 0.65;
-  animation: ballFloat 10s ease-in-out infinite -3s;
+  animation: ballFloatY 10s ease-in-out infinite -3s;
 }
 
-@keyframes ballFloat {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50%       { transform: translateY(-12px) rotate(3deg); }
+@keyframes ballFloatY {
+  0%, 100% { transform: translateY(calc(var(--px, 0px) + 0px)); }
+  50%       { transform: translateY(calc(var(--px, 0px) - 12px)); }
 }
 
 /* ── Metallic stars ──────────────────────────────────────────── */
@@ -708,8 +709,8 @@ footer {
 }
 
 @keyframes starFloat {
-  0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
-  50%       { transform: translateY(-10px) rotate(18deg) scale(1.05); }
+  0%, 100% { transform: translateY(calc(var(--px, 0px) + 0px)) rotate(0deg) scale(1); }
+  50%       { transform: translateY(calc(var(--px, 0px) - 10px)) rotate(18deg) scale(1.05); }
 }
 
 /* ── Balloon number ──────────────────────────────────────────── */
@@ -724,8 +725,8 @@ footer {
 }
 
 @keyframes numFloat {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(-14px); }
+  0%, 100% { transform: translateY(calc(var(--px, 0px) + 0px)); }
+  50%       { transform: translateY(calc(var(--px, 0px) - 14px)); }
 }
 
 /* ══════════════════════════════════════════════════════════════
