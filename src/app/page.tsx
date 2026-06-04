@@ -7,71 +7,55 @@ import { PARTY } from '@/lib/config'
 import DrinkRoulette from '@/components/DrinkRoulette'
 import Link from 'next/link'
 
-// Disco ball SVG component
+// Disco ball SVG — tileSize adapts to size
 function DiscoBall({ size = 200, style = {} }: { size?: number; style?: React.CSSProperties }) {
-  const tileSize = 12
+  const tileSize = Math.max(8, Math.floor(size / 18))
   const cols = Math.floor(size / tileSize)
   const rows = Math.floor(size / tileSize)
   const tiles = []
 
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
-      // Calculate if inside circle
       const cx = (c + 0.5) / cols - 0.5
       const cy = (r + 0.5) / rows - 0.5
       if (cx * cx + cy * cy > 0.23) continue
-
-      // Vary brightness for 3D effect
       const brightness = 0.4 + (1 - Math.abs(cx * 1.5)) * (1 - Math.abs(cy * 1.5)) * 0.6
       const shine = (Math.sin(c * 0.9) * Math.cos(r * 0.9) + 1) / 2
       const lightVal = Math.floor((brightness * 0.6 + shine * 0.4) * 220 + 20)
       const blueShift = Math.floor(lightVal * 1.05)
-      const color = `rgb(${lightVal},${lightVal},${Math.min(blueShift, 255)})`
-
       tiles.push(
-        <rect
-          key={`${r}-${c}`}
-          x={c * tileSize + 1}
-          y={r * tileSize + 1}
-          width={tileSize - 2}
-          height={tileSize - 2}
-          fill={color}
-          rx={1}
-        />
+        <rect key={`${r}-${c}`} x={c * tileSize + 1} y={r * tileSize + 1}
+          width={tileSize - 2} height={tileSize - 2}
+          fill={`rgb(${lightVal},${lightVal},${Math.min(blueShift, 255)})`} rx={1} />
       )
     }
   }
 
+  const uid = `ball-${size}`
   return (
-    <svg
-      viewBox={`0 0 ${size} ${size}`}
-      width={size}
-      height={size}
-      style={{ borderRadius: '50%', ...style }}
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg viewBox={`0 0 ${size} ${size}`} width={size} height={size}
+      style={{ borderRadius: '50%', display: 'block', ...style }}
+      xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <radialGradient id="discoGlow" cx="38%" cy="35%">
+        <radialGradient id={`glow-${uid}`} cx="38%" cy="35%">
           <stop offset="0%" stopColor="white" stopOpacity="0.6" />
           <stop offset="60%" stopColor="transparent" stopOpacity="0" />
         </radialGradient>
-        <clipPath id="ballClip">
+        <clipPath id={`clip-${uid}`}>
           <circle cx={size / 2} cy={size / 2} r={size * 0.48} />
         </clipPath>
       </defs>
-      <g clipPath="url(#ballClip)">
+      <g clipPath={`url(#clip-${uid})`}>
         {tiles}
-        {/* Shine overlay */}
-        <circle cx={size / 2} cy={size / 2} r={size * 0.48} fill="url(#discoGlow)" />
+        <circle cx={size / 2} cy={size / 2} r={size * 0.48} fill={`url(#glow-${uid})`} />
       </g>
     </svg>
   )
 }
 
-// Silver metallic star
 function MetalStar({ size = 60, style = {} }: { size?: number; style?: React.CSSProperties }) {
   return (
-    <svg viewBox="0 0 100 100" width={size} height={size} style={style} xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 100 100" width={size} height={size} style={{ display: 'block', ...style }} xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="starGrad" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#ffffff" />
@@ -81,21 +65,18 @@ function MetalStar({ size = 60, style = {} }: { size?: number; style?: React.CSS
           <stop offset="100%" stopColor="#9ba8b8" />
         </linearGradient>
       </defs>
-      <path
-        d="M50 5 L61 35 L95 35 L68 57 L79 91 L50 70 L21 91 L32 57 L5 35 L39 35 Z"
-        fill="url(#starGrad)"
-        filter="drop-shadow(0 3px 8px rgba(9,29,74,0.25))"
-      />
+      <path d="M50 5 L61 35 L95 35 L68 57 L79 91 L50 70 L21 91 L32 57 L5 35 L39 35 Z"
+        fill="url(#starGrad)" filter="drop-shadow(0 3px 8px rgba(9,29,74,0.22))" />
     </svg>
   )
 }
 
-// Metallic balloon number
 function BalloonNumber({ n, style = {} }: { n: number; style?: React.CSSProperties }) {
   return (
-    <svg viewBox="0 0 200 180" width={200} height={180} style={style} xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 220 190" width="100%" height="100%"
+      style={{ display: 'block', ...style }} xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <linearGradient id="balloonGrad" x1="15%" y1="10%" x2="85%" y2="90%">
+        <linearGradient id="ballGrad" x1="15%" y1="10%" x2="85%" y2="90%">
           <stop offset="0%" stopColor="#e8eff7" />
           <stop offset="18%" stopColor="#ffffff" />
           <stop offset="40%" stopColor="#9baec0" />
@@ -104,22 +85,13 @@ function BalloonNumber({ n, style = {} }: { n: number; style?: React.CSSProperti
           <stop offset="88%" stopColor="#7a92aa" />
           <stop offset="100%" stopColor="#b0c0ce" />
         </linearGradient>
-        <filter id="balloonShadow">
-          <feDropShadow dx="0" dy="6" stdDeviation="10" floodColor="rgba(9,29,74,0.18)" />
+        <filter id="ballShadow">
+          <feDropShadow dx="0" dy="5" stdDeviation="9" floodColor="rgba(9,29,74,0.16)" />
         </filter>
       </defs>
-      <text
-        x="100"
-        y="150"
-        textAnchor="middle"
-        fontFamily="Georgia, serif"
-        fontWeight="900"
-        fontSize="170"
-        fill="url(#balloonGrad)"
-        filter="url(#balloonShadow)"
-      >
-        {n}
-      </text>
+      <text x="110" y="158" textAnchor="middle" fontFamily="Georgia, serif"
+        fontWeight="900" fontSize="170"
+        fill="url(#ballGrad)" filter="url(#ballShadow)">{n}</text>
     </svg>
   )
 }
@@ -136,26 +108,36 @@ export default function Home() {
 
       <main className="page">
 
-        {/* ── Hero ──────────────────────────────────────────────────── */}
+        {/* ── Hero ─────────────────────────────────────────────── */}
         <section className="hero">
-          {/* Disco balls decorations */}
-          <div style={{ position: 'absolute', top: -50, left: -60, opacity: 0.8, zIndex: 0 }}>
+
+          {/* Disco ball top-left — clipped to edge */}
+          <div className="deco-ball deco-ball--tl" aria-hidden="true">
             <DiscoBall size={240} />
           </div>
-          <div style={{ position: 'absolute', bottom: 20, right: -30, opacity: 0.65, zIndex: 0 }}>
-            <DiscoBall size={170} />
+
+          {/* Disco ball bottom-right */}
+          <div className="deco-ball deco-ball--br" aria-hidden="true">
+            <DiscoBall size={160} />
           </div>
 
-          {/* Metallic stars */}
-          <MetalStar size={55} style={{ position: 'absolute', top: '18%', right: '8%', '--dur': '5s', '--delay': '-1s', '--rot': '12deg', animation: 'starFloat 5s ease-in-out infinite -1s' } as React.CSSProperties} />
-          <MetalStar size={38} style={{ position: 'absolute', top: '25%', right: '14%', '--dur': '7s', '--delay': '-3s', '--rot': '-8deg', animation: 'starFloat 7s ease-in-out infinite -3s' } as React.CSSProperties} />
-          <MetalStar size={42} style={{ position: 'absolute', bottom: '28%', left: '7%', '--dur': '6s', '--delay': '-2s', '--rot': '20deg', animation: 'starFloat 6s ease-in-out infinite -2s' } as React.CSSProperties} />
+          {/* Metallic stars — hidden on very small screens via CSS */}
+          <div className="deco-star deco-star--tr1" aria-hidden="true">
+            <MetalStar size={52} />
+          </div>
+          <div className="deco-star deco-star--tr2" aria-hidden="true">
+            <MetalStar size={36} />
+          </div>
+          <div className="deco-star deco-star--bl" aria-hidden="true">
+            <MetalStar size={40} />
+          </div>
 
-          {/* Balloon number */}
-          <div style={{ position: 'absolute', bottom: '22%', right: '10%', zIndex: 1, opacity: 0.9 }}>
+          {/* Balloon number — bottom right, contained */}
+          <div className="deco-num" aria-hidden="true">
             <BalloonNumber n={PARTY.age} />
           </div>
 
+          {/* Content */}
           <p className="pre-title fade-up">Estás invitado/a a celebrar a</p>
           <h1 className="hero-name display fade-up delay-1">{PARTY.name}</h1>
 
@@ -168,7 +150,6 @@ export default function Home() {
             {dateStr} · {PARTY.place}
           </p>
 
-          {/* Dress code badge */}
           <div className="dresscode-badge fade-up delay-4">
             <span>⬛</span> Dress code: Blanco / Negro <span>⬜</span>
           </div>
@@ -178,7 +159,7 @@ export default function Home() {
 
         <hr className="divider" />
 
-        {/* ── Countdown ─────────────────────────────────────────────── */}
+        {/* ── Countdown ────────────────────────────────────────── */}
         <section className="section" aria-labelledby="cd-title">
           <p className="section-label" id="cd-title">Faltan</p>
           <Countdown />
@@ -186,7 +167,7 @@ export default function Home() {
 
         <hr className="divider" />
 
-        {/* ── Location ──────────────────────────────────────────────── */}
+        {/* ── Location ─────────────────────────────────────────── */}
         <section className="section" aria-labelledby="loc-title">
           <p className="section-label" id="loc-title">El lugar de la fiesta</p>
           <div className="card location-card" style={{ cursor: 'default' }}>
@@ -201,7 +182,7 @@ export default function Home() {
 
         <hr className="divider" />
 
-        {/* ── Drinks ────────────────────────────────────────────────── */}
+        {/* ── Drinks ───────────────────────────────────────────── */}
         <section className="section" aria-labelledby="drinks-title">
           <p className="section-label" id="drinks-title">¿Qué llevas de tomar?</p>
           <DrinksList />
@@ -213,12 +194,12 @@ export default function Home() {
           <DrinkRoulette />
         </section>
 
-        {/* ── Message Wall ──────────────────────────────────────────── */}
+        {/* ── Message Wall ─────────────────────────────────────── */}
         <section className="wall-section" aria-labelledby="wall-title">
           <MessageWall />
         </section>
 
-        {/* ── RSVP ──────────────────────────────────────────────────── */}
+        {/* ── RSVP ─────────────────────────────────────────────── */}
         <section className="rsvp-section" aria-labelledby="rsvp-title">
           <h2 className="rsvp-title display" id="rsvp-title">¿Vas a venir?</h2>
           <p className="rsvp-sub">Confirma tu asistencia antes del {PARTY.rsvpDeadline}</p>
@@ -231,7 +212,6 @@ export default function Home() {
 
       </main>
 
-      {/* Admin link — bottom right corner */}
       <Link href="/admin" className="admin-link" aria-label="Panel de administración">
         ⚙ admin
       </Link>

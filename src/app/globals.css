@@ -627,7 +627,6 @@ footer {
 
 /* ── Responsive ────────────────────────────────────────────── */
 @media (max-width: 600px) {
-  .hero { padding: 4rem 1.25rem 5rem; }
   .hero-name { letter-spacing: -1px; }
   .hero-date { font-size: 11px; letter-spacing: 2px; }
   .countdown { gap: 0.6rem; }
@@ -648,4 +647,135 @@ footer {
   .form-row { flex-direction: column; gap: 10px; }
   .admin-link { bottom: 1rem; right: 1rem; font-size: 11px; padding: 7px 14px; }
   .msg-quote { font-size: 0.9rem; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   HERO DECORATIONS — responsive
+   ══════════════════════════════════════════════════════════════ */
+
+/* Shared base for all deco pieces */
+.deco-ball,
+.deco-star,
+.deco-num {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Disco ball top-left ─────────────────────────────────────── */
+.deco-ball--tl {
+  top: -60px;
+  left: -60px;
+  width: 240px;
+  height: 240px;
+  opacity: 0.85;
+  animation: ballFloat 8s ease-in-out infinite;
+}
+
+/* ── Disco ball bottom-right ─────────────────────────────────── */
+.deco-ball--br {
+  bottom: 40px;
+  right: -30px;
+  width: 160px;
+  height: 160px;
+  opacity: 0.65;
+  animation: ballFloat 10s ease-in-out infinite -3s;
+}
+
+@keyframes ballFloat {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50%       { transform: translateY(-12px) rotate(3deg); }
+}
+
+/* ── Metallic stars ──────────────────────────────────────────── */
+.deco-star--tr1 {
+  top: 18%;
+  right: 8%;
+  animation: starFloat 5s ease-in-out infinite -1s;
+}
+.deco-star--tr2 {
+  top: 26%;
+  right: 15%;
+  animation: starFloat 7s ease-in-out infinite -3.5s;
+}
+.deco-star--bl {
+  bottom: 30%;
+  left: 6%;
+  animation: starFloat 6s ease-in-out infinite -2s;
+}
+
+@keyframes starFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+  50%       { transform: translateY(-10px) rotate(18deg) scale(1.05); }
+}
+
+/* ── Balloon number ──────────────────────────────────────────── */
+.deco-num {
+  bottom: 14%;
+  right: 4%;
+  width: clamp(120px, 18vw, 220px);
+  height: auto;
+  aspect-ratio: 220 / 190;
+  opacity: 0.9;
+  animation: numFloat 7s ease-in-out infinite -1.5s;
+}
+
+@keyframes numFloat {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-14px); }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Tablet  (≤ 900px) ───────────────────────────────────────── */
+@media (max-width: 900px) {
+  .deco-ball--tl { width: 180px; height: 180px; top: -40px; left: -40px; }
+  .deco-ball--br { width: 120px; height: 120px; bottom: 30px; right: -20px; }
+  .deco-num      { width: clamp(100px, 16vw, 160px); bottom: 10%; right: 2%; }
+  .deco-star--tr1 { right: 5%; }
+  .deco-star--tr2 { right: 12%; }
+}
+
+/* ── Mobile (≤ 600px) ────────────────────────────────────────── */
+@media (max-width: 600px) {
+  /* Smaller balls — stay clipped to edge, don't overlap text */
+  .deco-ball--tl {
+    width: 130px;
+    height: 130px;
+    top: -30px;
+    left: -30px;
+  }
+  .deco-ball--br {
+    width: 100px;
+    height: 100px;
+    bottom: 16px;
+    right: -16px;
+  }
+
+  /* Stars: hide the two right-side ones, keep just the left one smaller */
+  .deco-star--tr1 { display: none; }
+  .deco-star--tr2 { display: none; }
+  .deco-star--bl  { bottom: 36%; left: 4%; }
+  .deco-star--bl svg { width: 28px; height: 28px; }
+
+  /* Balloon number: bottom-right, smaller, doesn't push content */
+  .deco-num {
+    width: 90px;
+    bottom: 8%;
+    right: 2%;
+    opacity: 0.75;
+  }
+
+  /* Hero: ensure min-height gives decorations space */
+  .hero { min-height: 100svh; padding: 5rem 1.25rem 6rem; }
+}
+
+/* ── Very small (≤ 380px) ────────────────────────────────────── */
+@media (max-width: 380px) {
+  .deco-ball--tl { width: 100px; height: 100px; top: -20px; left: -20px; }
+  .deco-ball--br { display: none; }
+  .deco-num      { width: 72px; opacity: 0.65; }
+  .deco-star--bl { display: none; }
 }
