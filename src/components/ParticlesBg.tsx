@@ -2,71 +2,61 @@
 import { useEffect, useRef } from 'react'
 
 export default function ParticlesBg() {
-  const starsRef = useRef<HTMLDivElement>(null)
-  const confRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    // Stars
-    const stars = starsRef.current
-    if (stars) {
-      for (let i = 0; i < 130; i++) {
-        const s = document.createElement('div')
-        s.className = 'star'
-        const size = Math.random() * 2.5 + 0.5
-        s.style.cssText = `
-          left:${Math.random() * 100}%;
-          top:${Math.random() * 100}%;
-          width:${size}px; height:${size}px;
-          --dur:${2 + Math.random() * 4}s;
-          --delay:-${Math.random() * 5}s;
-          --parallax-speed:${0.02 + Math.random() * 0.08};
-        `
-        stars.appendChild(s)
-      }
+    const container = containerRef.current
+    if (!container) return
+
+    // Disco light flickers
+    const colors = [
+      'rgba(180,210,255,0.4)',
+      'rgba(200,220,255,0.3)',
+      'rgba(155,168,184,0.35)',
+      'rgba(220,230,245,0.4)',
+      'rgba(10,30,110,0.08)',
+    ]
+
+    for (let i = 0; i < 18; i++) {
+      const d = document.createElement('div')
+      d.className = 'disco-flicker'
+      const size = 60 + Math.random() * 140
+      d.style.cssText = `
+        left:${Math.random() * 100}%;
+        top:${Math.random() * 100}%;
+        width:${size}px; height:${size}px;
+        background: radial-gradient(circle, ${colors[Math.floor(Math.random() * colors.length)]} 0%, transparent 70%);
+        --dur:${2 + Math.random() * 5}s;
+        --delay:-${Math.random() * 6}s;
+      `
+      container.appendChild(d)
     }
 
-    // Confetti
-    const conf = confRef.current
-    if (conf) {
-      const colors = ['#b48aff', '#ff85c2', '#78e0a4', '#ffd580', '#85cbff', '#f0a8ff']
-      for (let i = 0; i < 35; i++) {
-        const c = document.createElement('div')
-        c.className = 'confetti-piece'
-        const isCircle = Math.random() > 0.5
-        const drift = (Math.random() - 0.5) * 120
-        c.style.cssText = `
-          left:${Math.random() * 100}%;
-          top:-10px;
-          background:${colors[Math.floor(Math.random() * colors.length)]};
-          border-radius:${isCircle ? '50%' : '2px'};
-          width:${6 + Math.random() * 6}px;
-          height:${6 + Math.random() * 6}px;
-          --dur:${4 + Math.random() * 5}s;
-          --delay:-${Math.random() * 8}s;
-          --drift:${drift}px;
-        `
-        conf.appendChild(c)
-      }
+    // Sparkle star SVG elements
+    for (let i = 0; i < 12; i++) {
+      const s = document.createElement('div')
+      s.className = 'sparkle'
+      const size = 8 + Math.random() * 14
+      const opacity = 0.3 + Math.random() * 0.5
+      s.style.cssText = `
+        left:${5 + Math.random() * 90}%;
+        top:${5 + Math.random() * 90}%;
+        width:${size}px; height:${size}px;
+        --dur:${3 + Math.random() * 5}s;
+        --delay:-${Math.random() * 6}s;
+      `
+      s.innerHTML = `<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" style="opacity:${opacity}">
+        <path d="M10 0 L11.5 8.5 L20 10 L11.5 11.5 L10 20 L8.5 11.5 L0 10 L8.5 8.5 Z" fill="#9ba8b8"/>
+      </svg>`
+      container.appendChild(s)
     }
-
-    // Parallax on scroll
-    const handleScroll = () => {
-      const scrollY = window.scrollY
-      const starEls = starsRef.current?.querySelectorAll<HTMLElement>('.star')
-      starEls?.forEach(star => {
-        const speed = parseFloat(star.style.getPropertyValue('--parallax-speed') || '0.05')
-        star.style.transform = `translateY(${scrollY * speed}px)`
-      })
-    }
-
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   return (
-    <>
-      <div className="stars-bg" ref={starsRef} aria-hidden="true" />
-      <div ref={confRef} style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 1 }} aria-hidden="true" />
-    </>
+    <div
+      ref={containerRef}
+      style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}
+      aria-hidden="true"
+    />
   )
 }
