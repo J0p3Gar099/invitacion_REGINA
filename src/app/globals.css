@@ -623,6 +623,8 @@ footer {
   box-shadow: 0 2px 12px rgba(9,29,74,0.08);
   position: relative;
   z-index: 1;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
 /* ── Responsive ────────────────────────────────────────────── */
@@ -740,42 +742,81 @@ footer {
 
 /* ── Mobile (≤ 600px) ────────────────────────────────────────── */
 @media (max-width: 600px) {
-  /* Smaller balls — stay clipped to edge, don't overlap text */
+  /* Hero: enough padding so deco doesn't overlap content */
+  .hero {
+    min-height: 100svh;
+    padding: 6rem 1.25rem 7rem;
+    /* Push content to center, away from TL ball */
+    justify-content: center;
+  }
+
+  /* Pre-title: shorter letter-spacing so it fits 1 line */
+  .pre-title {
+    font-size: 10px;
+    letter-spacing: 3px;
+    padding: 0 2rem; /* indent past ball edge */
+  }
+
+  /* Hero name: slightly smaller on narrow phones */
+  .hero-name {
+    font-size: clamp(3rem, 13vw, 5rem);
+    letter-spacing: -1px;
+  }
+
+  /* Date: tighter */
+  .hero-date { font-size: 10px; letter-spacing: 2px; padding: 0 1rem; }
+
+  /* Dress code badge: always single line, smaller font */
+  .dresscode-badge {
+    font-size: 10px;
+    letter-spacing: 2px;
+    padding: 8px 16px;
+    gap: 6px;
+    /* Force single line */
+    white-space: nowrap;
+  }
+
+  /* ── Decorations ── */
+
+  /* TL ball: tucked into corner, smaller — well above text */
   .deco-ball--tl {
-    width: 130px;
-    height: 130px;
-    top: -30px;
-    left: -30px;
-  }
-  .deco-ball--br {
-    width: 100px;
-    height: 100px;
-    bottom: 16px;
-    right: -16px;
-  }
-
-  /* Stars: hide the two right-side ones, keep just the left one smaller */
-  .deco-star--tr1 { display: none; }
-  .deco-star--tr2 { display: none; }
-  .deco-star--bl  { bottom: 36%; left: 4%; }
-  .deco-star--bl svg { width: 28px; height: 28px; }
-
-  /* Balloon number: bottom-right, smaller, doesn't push content */
-  .deco-num {
-    width: 90px;
-    bottom: 8%;
-    right: 2%;
+    width: 120px;
+    height: 120px;
+    top: -20px;
+    left: -20px;
     opacity: 0.75;
   }
 
-  /* Hero: ensure min-height gives decorations space */
-  .hero { min-height: 100svh; padding: 5rem 1.25rem 6rem; }
+  /* BR ball: bottom right corner only */
+  .deco-ball--br {
+    width: 90px;
+    height: 90px;
+    bottom: 12px;
+    right: -12px;
+    opacity: 0.55;
+  }
+
+  /* Stars: only one, small, bottom-left clear of content */
+  .deco-star--tr1 { display: none; }
+  .deco-star--tr2 { display: none; }
+  .deco-star--bl  { bottom: 22%; left: 5%; }
+  .deco-star--bl svg { width: 26px; height: 26px; }
+
+  /* Balloon number: smaller, bottom-right above BR ball */
+  .deco-num {
+    width: 80px;
+    bottom: 10%;
+    right: 4%;
+    opacity: 0.7;
+  }
 }
 
 /* ── Very small (≤ 380px) ────────────────────────────────────── */
 @media (max-width: 380px) {
-  .deco-ball--tl { width: 100px; height: 100px; top: -20px; left: -20px; }
+  .deco-ball--tl { width: 90px; height: 90px; top: -15px; left: -15px; }
   .deco-ball--br { display: none; }
-  .deco-num      { width: 72px; opacity: 0.65; }
+  .deco-num      { width: 64px; opacity: 0.6; }
   .deco-star--bl { display: none; }
+  .pre-title     { font-size: 9px; letter-spacing: 2px; }
+  .dresscode-badge { font-size: 9px; letter-spacing: 1.5px; padding: 7px 12px; }
 }
