@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { subscribeRSVPs, subscribeAllMessages, approveMessage, rejectMessage, type RSVPEntry, type WallMessage } from '@/lib/firestore'
-import { loginAdmin, logoutAdmin, onAuthChange } from '@/lib/auth'
+import { loginAdmin, logoutUser, onAuthChange, isAdmin } from '@/lib/auth'
 import Link from 'next/link'
 
 export default function AdminPage() {
@@ -16,7 +16,7 @@ export default function AdminPage() {
   const [tab, setTab] = useState<'rsvps' | 'messages'>('rsvps')
 
   useEffect(() => {
-    const unsub = onAuthChange(user => { setAuthed(!!user); setLoading(false) })
+    const unsub = onAuthChange(user => { setAuthed(isAdmin(user)); setLoading(false) })
     return unsub
   }, [])
 
@@ -148,7 +148,7 @@ export default function AdminPage() {
             Panel de admin
           </h1>
           <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-            <button onClick={logoutAdmin} style={{
+            <button onClick={logoutUser} style={{
               background: 'transparent', border: `1.5px solid ${borderNav}`,
               borderRadius: 100, padding: '6px 16px', fontSize: 12,
               color: muted, cursor: 'pointer', fontFamily: 'inherit',

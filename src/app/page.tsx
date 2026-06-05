@@ -1,14 +1,15 @@
+'use client'
 import ParticlesBg from '@/components/ParticlesBg'
 import HeroParallax from '@/components/HeroParallax'
 import ConfettiBlast from '@/components/ConfettiBlast'
 import DiscoSpotlights from '@/components/DiscoSpotlights'
 import Countdown from '@/components/Countdown'
-import DrinksList from '@/components/DrinksList'
+import Trivia from '@/components/Trivia'
 import MessageWall from '@/components/MessageWall'
 import RSVPForm from '@/components/RSVPForm'
 import { PARTY } from '@/lib/config'
-import DrinkRoulette from '@/components/DrinkRoulette'
 import Link from 'next/link'
+import { useAuth } from '@/components/AuthProvider'
 
 // Disco ball SVG — tileSize adapts to size
 function DiscoBall({ size = 200, style = {} }: { size?: number; style?: React.CSSProperties }) {
@@ -100,6 +101,7 @@ function BalloonNumber({ n, style = {} }: { n: number; style?: React.CSSProperti
 }
 
 export default function Home() {
+  const { admin } = useAuth()
   const partyDate = new Date(PARTY.date)
   const dateStr = partyDate.toLocaleDateString('es-MX', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
@@ -188,16 +190,10 @@ export default function Home() {
 
         <hr className="divider" />
 
-        {/* ── Drinks ───────────────────────────────────────────── */}
-        <section className="section" aria-labelledby="drinks-title">
-          <p className="section-label" id="drinks-title">¿Qué llevas de tomar?</p>
-          <DrinksList />
-        </section>
-
-        <hr className="divider" />
-
-        <section className="section" aria-labelledby="roulette-title">
-          <DrinkRoulette />
+        {/* ── Trivia ───────────────────────────────────────────── */}
+        <section className="section" aria-labelledby="trivia-title">
+          <p className="section-label" id="trivia-title">¿Cuánto sabes de la fiesta?</p>
+          <Trivia />
         </section>
 
         {/* ── Message Wall ─────────────────────────────────────── */}
@@ -218,9 +214,11 @@ export default function Home() {
 
       </main>
 
-      <Link href="/admin" className="admin-link" aria-label="Panel de administración">
-        ⚙ admin
-      </Link>
+      {admin && (
+        <Link href="/admin" className="admin-link" aria-label="Panel de administración">
+          ⚙ admin
+        </Link>
+      )}
     </>
   )
 }

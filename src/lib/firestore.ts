@@ -1,7 +1,7 @@
 import {
   collection, addDoc, onSnapshot, query, orderBy,
   doc, setDoc, getDoc, updateDoc, serverTimestamp,
-  where, getDocs
+  where, getDocs, deleteDoc
 } from 'firebase/firestore'
 import { db } from './firebase'
 
@@ -12,6 +12,7 @@ export interface RSVPEntry {
   guests: number
   attending: boolean
   message?: string
+  email?: string
   createdAt?: unknown
 }
 
@@ -29,10 +30,19 @@ export interface GiftClaim {
   claimedAt?: unknown
 }
 
-export interface DrinkVote {
-  drinkId: string
-  voterName: string
+export interface TriviaResult {
+  id?: string
+  userId: string
+  displayName: string
+  score: number
+  total: number
+  answeredIndices: number[]
+  answers: Record<number, number>
+  completed: boolean
+  cheer?: string
+  noteSent?: boolean
   createdAt?: unknown
+  updatedAt?: unknown
 }
 
 // ─── RSVP ────────────────────────────────────────────────────
@@ -41,6 +51,18 @@ export async function submitRSVP(data: Omit<RSVPEntry, 'id' | 'createdAt'>) {
     ...data,
     createdAt: serverTimestamp(),
   })
+}
+
+export async function deleteRSVP(id: string) {
+  return deleteDoc(doc(db, 'rsvps', id))
+}
+
+export async function getRSVPByEmail(email: string): Promise<RSVPEntry | null> {
+  const q = query(collection(db, 'rsvps'), where('email', '==', email))
+  const snap = await getDocs(q)
+  if (snap.empty) return null
+  const d = snap.docs[0]
+  return { id: d.id, ...d.data() } as RSVPEntry
 }
 
 export function subscribeRSVPs(cb: (entries: RSVPEntry[]) => void) {
@@ -54,7 +76,7 @@ export function subscribeRSVPs(cb: (entries: RSVPEntry[]) => void) {
 export async function submitMessage(data: Omit<WallMessage, 'id' | 'createdAt' | 'approved'>) {
   return addDoc(collection(db, 'messages'), {
     ...data,
-    approved: false, // requires moderation
+    approved: false,
     createdAt: serverTimestamp(),
   })
 }
@@ -70,7 +92,6 @@ export function subscribeApprovedMessages(cb: (msgs: WallMessage[]) => void) {
   )
 }
 
-// Admin: all messages
 export function subscribeAllMessages(cb: (msgs: WallMessage[]) => void) {
   const q = query(collection(db, 'messages'), orderBy('createdAt', 'desc'))
   return onSnapshot(q, snap =>
@@ -111,22 +132,42 @@ export function subscribeGifts(cb: (claims: Record<string, GiftClaim>) => void) 
   })
 }
 
-// ─── Drinks ───────────────────────────────────────────────────
-export async function voteDrink(drinkId: string, voterName: string) {
-  return addDoc(collection(db, 'drinks'), {
-    drinkId,
-    voterName,
-    createdAt: serverTimestamp(),
+// ─── Trivia ───────────────────────────────────────────────────
+export async function getTriviaResult(uid: string): Promise<TriviaResult | null> {
+  const snap = await getDoc(doc(db, 'trivia', uid))
+  if (!snap.exists()) return null
+  return { id: snap.id, ...snap.data() } as TriviaResult
+}
+
+export async function saveTriviaProgress(uid: string, data: Omit<TriviaResult, 'id' | 'createdAt'>) {
+  const ref = doc(db, 'trivia', uid)
+  const snap = await getDoc(ref)
+  if (snap.exists()) {
+    return updateDoc(ref, { ...data, updatedAt: serverTimestamp() })
+  }
+  return setDoc(ref, { ...data, createdAt: serverTimestamp(), updatedAt: serverTimestamp() })
+}
+
+export function subscribeLeaderboard(cb: (results: TriviaResult[]) => void) {
+  // Single orderBy avoids needing a composite index in Firestore
+  const q = query(collection(db, 'trivia'), orderBy('score', 'desc'))
+  return onSnapshot(q, snap => {
+    cb(snap.docs.map(d => ({ id: d.id, ...d.data() } as TriviaResult)))
   })
 }
 
-export function subscribeDrinks(cb: (votes: Record<string, number>) => void) {
-  return onSnapshot(collection(db, 'drinks'), snap => {
-    const counts: Record<string, number> = {}
-    snap.docs.forEach(d => {
-      const { drinkId } = d.data()
-      counts[drinkId] = (counts[drinkId] ?? 0) + 1
-    })
-    cb(counts)
+export async function saveCheer(uid: string, cheer: string) {
+  return updateDoc(doc(db, 'trivia', uid), { cheer })
+}
+
+export async function saveNoteSent(uid: string) {
+  return updateDoc(doc(db, 'trivia', uid), { noteSent: true })
+}
+
+// ─── Notas anónimas ───────────────────────────────────────────
+export async function submitNote(text: string) {
+  return addDoc(collection(db, 'notes'), {
+    text,
+    createdAt: serverTimestamp(),
   })
 }

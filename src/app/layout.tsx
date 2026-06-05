@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { Playfair_Display, DM_Sans } from 'next/font/google'
 import './globals.css'
 import { PARTY } from '@/lib/config'
+import { AuthProvider } from '@/components/AuthProvider'
+import { AuthGate } from '@/components/AuthGate'
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -28,7 +30,13 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" className={`${playfair.variable} ${dmSans.variable}`}>
-      <body>{children}</body>
+      <body>
+        <AuthProvider>
+          <AuthGate>
+            {children}
+          </AuthGate>
+        </AuthProvider>
+      </body>
     </html>
   )
 }
