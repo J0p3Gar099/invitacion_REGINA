@@ -163,6 +163,23 @@ export async function saveCheer(uid: string, cheer: string) {
 export async function saveNoteSent(uid: string) {
   return updateDoc(doc(db, 'trivia', uid), { noteSent: true })
 }
+export async function voteDrink(drinkId: string) {
+  const ref = doc(db, 'drinks', drinkId)
+  const snap = await getDoc(ref)
+  if (snap.exists()) {
+    const current = (snap.data().votes as number) ?? 0
+    return updateDoc(ref, { votes: current + 1 })
+  }
+  return setDoc(ref, { drinkId, votes: 1 })
+}
+
+export function subscribeDrinks(cb: (votes: Record<string, number>) => void) {
+  return onSnapshot(collection(db, 'drinks'), snap => {
+    const map: Record<string, number> = {}
+    snap.docs.forEach(d => { map[d.id] = (d.data().votes as number) ?? 0 })
+    cb(map)
+  })
+}
 
 // ─── Notas anónimas ───────────────────────────────────────────
 export async function submitNote(text: string) {
