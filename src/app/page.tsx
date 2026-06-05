@@ -186,6 +186,38 @@ export default function Home() {
               <span className="pill">{PARTY.time}</span>
             </div>
           </div>
+
+          {/* Map embed */}
+          <div style={{
+            width: '100%', borderRadius: '1rem', overflow: 'hidden',
+            marginTop: '1.25rem', boxShadow: '0 4px 24px rgba(0,0,0,0.35)',
+            border: '1px solid rgba(255,255,255,0.08)'
+          }}>
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3760.8368300093066!2d-99.23483230000001!3d19.505654699999997!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d2030023b3ea07%3A0x39327d3cd2aa9fb0!2sMezontle%20Sat%C3%A9lite!5e0!3m2!1ses-419!2smx!4v1780680276388!5m2!1ses-419!2smx"
+              width="100%"
+              height="280"
+              style={{ border: 0, display: 'block' }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Ubicación de la fiesta"
+            />
+          </div>
+
+          {/* Link to open in Google Maps */}
+          <a
+            href="https://maps.app.goo.gl/2D3VyiduaZjdFiHfA"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-block', marginTop: '0.75rem',
+              fontSize: '0.85rem', color: 'var(--accent)',
+              textDecoration: 'none', opacity: 0.85
+            }}
+          >
+            📍 Abrir en Google Maps →
+          </a>
         </section>
 
         <hr className="divider" />
